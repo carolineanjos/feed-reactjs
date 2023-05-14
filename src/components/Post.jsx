@@ -8,8 +8,8 @@ import styles from './Post.module.css';
 
 
 export function Post({ author, publishedAt, content }) {
-  const [ comments, setComments ] = useState(['Post muito bacana!'])
-  const [ newCommentText, setNewCommentText ] = useState([''])
+  const [ comments, setComments ] = useState(['Post muito bacana!']);
+  const [ newCommentText, setNewCommentText ] = useState(['']);
 
   const publisehdDateFormated = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
     locale: ptBR
@@ -21,19 +21,30 @@ export function Post({ author, publishedAt, content }) {
   })
 
   function handleCreateNewComment() {
-    event.preventDefault()
+    event.preventDefault();
 
     setComments([...comments, newCommentText])
-    setNewCommentText("")
+    setNewCommentText("");
   }
 
   function handleNewCommentChange() {
-    setNewCommentText(event.target.value)
+    event.target.setCustomValidity("");
+    setNewCommentText(event.target.value);
   }
 
-  function deleteComment(comment){
-    console.log(`deletar commentario ${comment}`)
+  function handleNewCommentInvalid() {
+    event.target.setCustomValidity("Esse campo é obrigatório!");
   }
+
+  function deleteComment(commentToDelete){
+    const commentsWithoutDeletedOne = comments.filter(comment => {
+      return comment !== commentToDelete;
+    })
+
+    setComments(commentsWithoutDeletedOne);
+  }
+
+  const isNewCommentEmpty = newCommentText.length === 0
 
   return (
     <article className={styles.post}>
@@ -70,9 +81,11 @@ export function Post({ author, publishedAt, content }) {
         placeholder="Deixe um comentário"
         onChange={handleNewCommentChange}
         value={newCommentText}
+        onInvalid={handleNewCommentInvalid}
+        required
         />
         <footer>
-          <button type="submit"> Publicar </button>
+          <button type="submit" disabled={isNewCommentEmpty} > Publicar </button>
         </footer>
       </form>
 
